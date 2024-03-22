@@ -15,14 +15,15 @@ export const blogRouter = new Hono<{
 }>();
 
 
-
+// middleware
 blogRouter.use('/*', async (c, next) => {      // Since this route should be accessible only after authentication so the jwt token must be passed as a header in this route
-  const jwt = c.req.header('Authorization');
+  const jwt = c.req.header("Authorization" || "");
 
   if (!jwt) {
     c.status(401)
     return c.json({ error: "Unauthorized entity" })
   }
+    
   const token = jwt.split(" ")[1];              //as the token is the 2nd 
   const payload = await verify(token, c.env.JWT_SECRET)
   if (!payload) {
@@ -81,15 +82,15 @@ blogRouter.put('/', async (c) => {
     })
 })
 
-blogRouter.get('/', async (c) => {
+blogRouter.get('/:id', async (c) => {
     const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate())
 
-    const body = await c.req.json();
+    const id = c.req.param("id");
     try {
         const post = await prisma.post.findUnique({
-        where: {id: body.id}
+        where: { id: Number(id) }
         })
         return c.json({ post })
     } catch (e) {
