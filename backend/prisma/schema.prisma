@@ -28,6 +28,7 @@ model Post {
   id String @id @default(uuid())    //uuid : universally unique identifiers
   title String
   content String
+  thumbnail String?
   published Boolean  @default(false)
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String
