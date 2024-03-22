@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { verify } from "hono/jwt";
-import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
+import { PrismaClient } from "@prisma/client/edge";
 
 
 export const blogRouter = new Hono<{
@@ -89,9 +89,11 @@ blogRouter.get('/:id', async (c) => {
 
     const id = c.req.param("id");
     try {
-        const post = await prisma.post.findUnique({
-        where: { id: Number(id) }
-        })
+        const post = await prisma.post.findFirst({
+            where: {
+                id: id
+            }
+        })                  
         return c.json({ post })
     } catch (e) {
         c.status(404);
