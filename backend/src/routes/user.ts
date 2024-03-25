@@ -33,6 +33,7 @@ userRouter.post('/signup', async (c) => {
   
 userRouter.post('/signin', async (c) => {
     const prisma = new PrismaClient({
+    //@ts-ignore
         datasourceUrl: c.env?.DATABASE_URL	,
     }).$extends(withAccelerate());
 
@@ -52,3 +53,4 @@ userRouter.post('/signin', async (c) => {
     const jwt = await sign({ id: user.id }, c.env.JWT_SECRET);
     return c.json({ jwt });
 })
+
