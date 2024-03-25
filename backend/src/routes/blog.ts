@@ -39,11 +39,11 @@ blogRouter.use('/*', async (c, next) => {      // Since this route should be acc
 
 
 
-blogRouter.post('/post', async (c) => {
+blogRouter.post('/', async (c) => {
     const userId = c.get('userId')
 
     const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
+        datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate())
 
     const body = await c.req.json();
@@ -61,6 +61,7 @@ blogRouter.post('/post', async (c) => {
 })
 
 blogRouter.put('/', async (c) => {
+    const userId = c.get('userId')
     const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate())
@@ -68,7 +69,8 @@ blogRouter.put('/', async (c) => {
     const body = await c.req.json();
     const post = await prisma.post.update({
         where: {
-            id: body.id
+            id: body.id,
+            authorId: userId
         },
         data: {
             title: body.title,
@@ -76,29 +78,8 @@ blogRouter.put('/', async (c) => {
             
         }
     })
-
-    return c.json({
-        id: post.id
-    })
-})
-
-blogRouter.get('/:id', async (c) => {
-    const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
-    }).$extends(withAccelerate())
-
-    const id = c.req.param("id");
-    try {
-        const post = await prisma.post.findFirst({
-            where: {
-                id: id
-            }
-        })                  
-        return c.json({ post })
-    } catch (e) {
-        c.status(404);
-        return c.json({message: "Error while fetching request..."} )
-    }
+    c.text("updated post")
+    return c.json({post})
 })
 
 blogRouter.get('/bulk', async (c) => {
@@ -110,6 +91,29 @@ blogRouter.get('/bulk', async (c) => {
 
     return c.json({ posts })
 })
+
+blogRouter.get('/:id', async (c) => {
+    const id = c.req.param("id");
+   
+    const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate())
+
+    
+    try {
+        const post = await prisma.post.findUnique({
+            where: {
+                id
+            }
+        })                  
+        return c.json({ post })
+    } catch (e) {
+        c.status(404);
+        return c.json({message: "Error while fetching request..."} )
+    }
+})
+
+
 
 
 
