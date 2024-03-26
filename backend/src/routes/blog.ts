@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
+import { blogInput, blogUpdate } from "@zekrozo/blog-it-comm";
 import { Hono } from "hono";
 import { verify } from "hono/jwt";
 
@@ -36,16 +37,31 @@ blogRouter.post('/', async (c) => {
 	}).$extends(withAccelerate());
 
 	const body = await c.req.json();
-	const post = await prisma.post.create({
-		data: {
-			title: body.title,
-			content: body.content,
-			authorId: userId
-		}
-	});
-	return c.json({
-		id: post.id
-	});
+	const { success } = blogInput.safeParse(body)
+	if (!success) {
+		c.status(411)
+		return c.json({
+			message: "Incorrect inputs!"
+		})
+	}
+
+	try {
+		const post = await prisma.post.create({
+			data: {
+				title: body.title,
+				content: body.content,
+				authorId: userId
+			}
+		});
+		return c.json({
+			id: post.id
+		});
+	} catch (error) {
+		c.status(403)
+		return c.json({
+			message: "Error while posting the blog"
+		})
+	}
 })
 
 blogRouter.put('/', async (c) => {
@@ -55,18 +71,34 @@ blogRouter.put('/', async (c) => {
 	}).$extends(withAccelerate());
 
 	const body = await c.req.json();
-	prisma.post.update({
-		where: {
-			id: body.id,
-			authorId: userId
-		},
-		data: {
-			title: body.title,
-			content: body.content
-		}
-	});
+	const { success } = blogUpdate.safeParse(body)
+	if (!success) {
+		c.status(411)
+		return c.json({
+			message: "incorrect inputs"
+		})
+	}
 
-	return c.text('updated post');
+	try {
+		prisma.post.update({
+			where: {
+				id: body.id,
+				authorId: userId
+			},
+			data: {
+				title: body.title,
+				content: body.content
+			}
+		});
+
+		return c.text('updated post');
+	} catch (error) {
+		c.status(403)
+		return c.json({
+			message: "Error while updating the blog"
+		})
+	}
+	
 });
 
 blogRouter.get('/:id', async (c) => {
