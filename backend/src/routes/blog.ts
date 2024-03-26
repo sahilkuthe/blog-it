@@ -78,6 +78,7 @@ blogRouter.put('/', async (c) => {
 			message: "incorrect inputs"
 		})
 	}
+	
 
 	try {
 		prisma.post.update({
