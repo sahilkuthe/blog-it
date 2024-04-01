@@ -1,11 +1,12 @@
-
-export function initMiddleware(app) {
-    app.use('/api/v1/blog/*', async (c, next) => {
+import { Context } from "hono";
+import { verify } from "hono/jwt";
+export function initMiddleware(app: any) {
+    app.use('/api/v1/blog/*', async (c: Context, next: Function) => {
         const header = c.req.header("authorization") || "";
         // Bearer token => ["Bearer", "token"];
         const token = header.split(" ")[1]
         
-        // @ts-ignore
+        
         const response = await verify(token, c.env.JWT_SECRET)
         if (response.id) {
           next()
