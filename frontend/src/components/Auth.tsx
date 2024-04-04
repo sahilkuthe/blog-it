@@ -3,6 +3,7 @@ import axios from "axios"
 import { ChangeEvent, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { BACKEND_URL } from "../config"
+import { AlertMessage } from "./AlertMessage"
 
 
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
@@ -20,7 +21,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
             localStorage.setItem("token", jwt);
             navigate("/blogs")
         } catch (e) {
-            
+            <AlertMessage message="Wrong inputs" />
         }
     }
 
@@ -53,7 +54,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
                         })
                     }} />
                     
-                    <LabelledInput label="Password" type={"password"} placeholder="" onChange={(e) => {
+                    <LabelledInput label="Password" type={"password"} placeholder="########" onChange={(e) => {
                         setPostInputs({
                             ...postInput,
                             password: e.target.value
