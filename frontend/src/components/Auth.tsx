@@ -1,14 +1,28 @@
 import {  SignupInput } from "@zekrozo/blog-it-comm"
+import axios from "axios"
 import { ChangeEvent, useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { BACKEND_URL } from "../config"
 
 
-export const Auth = ({type}: {type: "signup" | "signin"}) => {
+export const Auth = ({ type }: { type: "signup" | "signin" }) => {
+    const navigate = useNavigate()
     const [postInput, setPostInputs] = useState<SignupInput>({
         name: "",
         username: "",
         password: ""
     })
+
+    async function sendRequest() {
+        try {
+            const response = await axios.post(`${BACKEND_URL}/api/v1/user/${type === "signup" ? "signup" : "signin"}`, postInput)
+            const jwt = response.data;
+            localStorage.setItem("token", jwt);
+            navigate("/blogs")
+        } catch (e) {
+            
+        }
+    }
 
     return <div className="h-screen flex justify-center flex-col bg-orange-100 ">
         <div className="flex justify-center">
@@ -46,7 +60,7 @@ export const Auth = ({type}: {type: "signup" | "signin"}) => {
                         })
                     }} />
                     <div>
-                        <button type="button" className="text-white text-lg font-bold bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:ring-orange-400 rounded-lg px-5 py-2.5 me-2 mb-2 :bg-blue-600 w-full mt-7 ">{ type=== "signup" ? "Sign up" : "Sign in" }</button>
+                        <button onClick={sendRequest} type="button" className="text-white text-lg font-bold bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:ring-orange-400 rounded-lg px-5 py-2.5 me-2 mb-2 :bg-blue-600 w-full mt-7 ">{ type=== "signup" ? "Sign up" : "Sign in" }</button>
 
                     </div>
 
