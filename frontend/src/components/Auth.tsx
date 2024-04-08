@@ -3,7 +3,6 @@ import axios from "axios"
 import { ChangeEvent, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { BACKEND_URL } from "../config"
-import { AlertMessage } from "./AlertMessage"
 
 
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
@@ -17,11 +16,28 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
     async function sendRequest() {
         try {
             const response = await axios.post(`${BACKEND_URL}/api/v1/user/${type === "signup" ? "signup" : "signin"}`, postInput)
-            const jwt = response.data;
-            localStorage.setItem("token", jwt);
-            navigate("/blogs")
+            let jwt: string;
+            if (response.status === 200) {
+                const responseData = response.data;
+                // Check if responseData is an object containing the token
+                
+
+            if (typeof responseData === 'object' && responseData.jwt) {
+                jwt = responseData.jwt;
+            } else if (typeof responseData === 'string') {
+                jwt = responseData;
+            } else {
+                console.error("JWT token not found in response data.");
+                return;
+            }
+            console.log(jwt); // Check if jwt is received correctly
+            localStorage.setItem("token","Bearer " + jwt);
+            navigate("/blogs");
+        } else {
+            console.error("Unexpected response:", response);
+        }
         } catch (e) {
-            <AlertMessage message="Wrong inputs" />
+            console.error("error occured", e)
         }
     }
 
