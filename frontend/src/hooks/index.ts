@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { BACKEND_URL } from "../config";
 
 
-interface Blog{
+export interface Blog{
     "id": string,
     "title": string,
     "content": string,
@@ -23,7 +23,7 @@ export const useBlog = ({ id }: { id : string }) => {
             }
         })
             .then(response => {
-                setBlog(response.data.blog);
+                setBlog(response.data);
                 setLoading(false);
             })
     }, [id])
