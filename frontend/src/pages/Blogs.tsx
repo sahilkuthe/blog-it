@@ -29,7 +29,7 @@ export const Blogs = () => {
 
         < div className = "flex justify-center bg-orange-100 h-screen" >
             <div className="max-w-2xl">
-                {blogs.map(blog => <BlogCard id={blog.id} avatar="./src/assets/luffy.jpg"
+                {blogs.map(blog => <BlogCard id={blog.id} avatar="/luffy.jpg"
                     authorName={blog.author.name || "Anonymous"}
                     publishedDate="Dec 3 2023"
                     title={blog.title}
